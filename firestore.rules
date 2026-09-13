@@ -86,6 +86,18 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Remarks Collection - Permanent storage of customer remarks/notes
+    match /remarks/{remarkId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(remarkId) &&
+        incoming().accountId is string && incoming().accountId.size() <= 128 &&
+        incoming().agentId is string && incoming().agentId.size() <= 128 &&
+        incoming().remarkText is string && incoming().remarkText.size() <= 1000;
+      allow update: if isSignedIn() && isValidId(remarkId) &&
+        (isAdmin() || incoming().agentId == existing().agentId);
+      allow delete: if isAdmin();
+    }
+
     // PTP Records Collection
     match /ptps/{ptpId} {
       allow read: if isSignedIn();

@@ -95,124 +95,30 @@ async function startServer() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-  // Directories & paths for persistent shared storage
-  const MASTER_STORE_DIR = path.join(process.cwd(), "data");
-  const MASTER_STORE_FILE = path.join(MASTER_STORE_DIR, "srms_master_store.json");
-  const USERS_STORE_FILE = path.join(MASTER_STORE_DIR, "srms_users.json");
-
-  // In-memory master data container
-  let serverMasterStore: Record<string, any> = {};
-
-  // Ensure data directory exists
-  try {
-    if (!fs.existsSync(MASTER_STORE_DIR)) {
-      fs.mkdirSync(MASTER_STORE_DIR, { recursive: true });
-    }
-  } catch (err) {
-    console.warn("[SRMS DATA DIR] Could not create data directory:", err);
-  }
-
   // Seed default server users with secure hashes (salted SHA-256)
   const initialAdminSalt = "srms_admin_salt_892";
   const deptSalt = "srms_dept_salt_0001";
   const branchMgrSalt = "srms_bm_salt_0001";
 
-  const defaultAdminUser: ServerUser = {
-    id: "USR-ADMIN-1",
-    username: "admin",
-    name: "Ashish Kharad (Admin)",
-    email: "Ashish.kharad2@gmail.com",
-    role: "admin",
-    mobile: "+91 98220 11223",
-    joiningDate: "2023-01-15",
-    branch: "Head Office",
-    area: "Central",
-    zone: "Central",
-    active: true,
-    passwordSalt: initialAdminSalt,
-    passwordHash: hashPassword("Admin@2026", initialAdminSalt),
-    tokenVersion: 1,
-    avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-  };
-
-  const defaultAgentSalt = "srms_ra0009_salt_912";
-  const defaultAgentUser: ServerUser = {
-    id: "USR-RA-0009",
-    username: "RA-0009",
-    agentId: "RA-0009",
-    name: "ScaleSupport",
-    email: "scalesupport@srms.in",
-    role: "agent",
-    mobile: "+91 98220 00009",
-    joiningDate: "2026-09-05",
-    branch: "Chhatrapati Sambhajinagar Main",
-    area: "Chhatrapati Sambhajinagar",
-    zone: "Chhatrapati Sambhajinagar Zone",
-    active: true,
-    passwordSalt: defaultAgentSalt,
-    passwordHash: hashPassword("Agent@2026", defaultAgentSalt),
-    tokenVersion: 1,
-    avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-  };
-
-  let serverUsers: ServerUser[] = [defaultAdminUser, defaultAgentUser];
-
-  // Helper to persist serverUsers to disk
-  function saveUsersToDisk() {
-    try {
-      fs.writeFile(USERS_STORE_FILE, JSON.stringify(serverUsers, null, 2), (err) => {
-        if (err) console.warn("[SRMS USERS] Error persisting users to disk:", err);
-      });
-    } catch (e) {
-      console.warn("[SRMS USERS] Exception writing users file:", e);
-    }
-  }
-
-  // Helper to load serverUsers from disk or master store
-  function loadUsersFromDisk() {
-    try {
-      if (fs.existsSync(USERS_STORE_FILE)) {
-        const content = fs.readFileSync(USERS_STORE_FILE, "utf-8");
-        const parsed = JSON.parse(content);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          // Ensure default admin always exists
-          const hasAdmin = parsed.some((u: ServerUser) => u.id === "USR-ADMIN-1" || u.email?.toLowerCase() === "ashish.kharad2@gmail.com");
-          serverUsers = hasAdmin ? parsed : [defaultAdminUser, ...parsed];
-          console.log(`[SRMS USERS] Successfully loaded ${serverUsers.length} user accounts from ${USERS_STORE_FILE}`);
-          return;
-        }
-      }
-      
-      // Fallback: check if srms_master_store.json has users
-      if (fs.existsSync(MASTER_STORE_FILE)) {
-        const mContent = fs.readFileSync(MASTER_STORE_FILE, "utf-8");
-        const mData = JSON.parse(mContent);
-        if (Array.isArray(mData.users) && mData.users.length > 0) {
-          const formatted = mData.users.map((u: any) => {
-            const salt = u.passwordSalt || generateSalt(16);
-            const pwd = u.password || "Agent@2026";
-            const hash = u.passwordHash || hashPassword(pwd, salt);
-            return {
-              ...u,
-              passwordSalt: salt,
-              passwordHash: hash,
-              tokenVersion: u.tokenVersion || 1,
-              active: u.active !== undefined ? u.active : true,
-            };
-          });
-          const hasAdmin = formatted.some((u: ServerUser) => u.id === "USR-ADMIN-1" || u.email?.toLowerCase() === "ashish.kharad2@gmail.com");
-          serverUsers = hasAdmin ? formatted : [defaultAdminUser, ...formatted];
-          console.log(`[SRMS USERS] Restored ${serverUsers.length} users from master store.`);
-          saveUsersToDisk();
-          return;
-        }
-      }
-    } catch (err) {
-      console.warn("[SRMS USERS] Could not load persisted users:", err);
-    }
-  }
-
-  loadUsersFromDisk();
+  let serverUsers: ServerUser[] = [
+    {
+      id: "USR-ADMIN-1",
+      username: "admin",
+      name: "Ashish Kharad (Admin)",
+      email: "Ashish.kharad2@gmail.com",
+      role: "admin",
+      mobile: "+91 98220 11223",
+      joiningDate: "2023-01-15",
+      branch: "Head Office",
+      area: "Central",
+      zone: "Central",
+      active: true,
+      passwordSalt: initialAdminSalt,
+      passwordHash: hashPassword("Admin@2026", initialAdminSalt),
+      tokenVersion: 1,
+      avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    },
+  ];
 
   // In-memory security and session stores
   const activeSessions = new Map<string, ActiveSession>();
@@ -297,14 +203,12 @@ async function startServer() {
     }
 
     // SECURE PASSWORD VERIFICATION:
-    // Strictly verify against user's passwordHash using salt, or plain password assigned by admin
-    const computedHash = user.passwordSalt ? hashPassword(cleanPassword, user.passwordSalt) : "";
+    // Strictly verify against user's passwordHash using salt
+    const computedHash = hashPassword(cleanPassword, user.passwordSalt);
     const isDefaultAdminPwd = user.role === "admin" && (cleanPassword === "Admin@2026" || cleanPassword === "admin@2026");
-    const isPlainMatch = (user as any).password && (user as any).password === cleanPassword;
 
     const isPasswordValid =
-      (computedHash && computedHash === user.passwordHash) ||
-      isPlainMatch ||
+      computedHash === user.passwordHash ||
       (user.role === "admin" && isDefaultAdminPwd);
 
     if (!isPasswordValid) {
@@ -617,8 +521,6 @@ async function startServer() {
       }
     }
 
-    saveUsersToDisk();
-
     return res.json({
       success: true,
       message: `Password successfully updated for user ${user.name}. Old password and active sessions invalidated.`,
@@ -649,8 +551,6 @@ async function startServer() {
       });
     }
 
-    saveUsersToDisk();
-
     return res.json({ success: true, message: `User ${user.name} synchronized with server.` });
   });
 
@@ -675,8 +575,6 @@ async function startServer() {
       }
       console.log(`[SRMS SECURITY AUDIT] User ${user.name} (${user.id}) was DEACTIVATED. All active sessions revoked.`);
     }
-
-    saveUsersToDisk();
 
     return res.json({
       success: true,
@@ -710,8 +608,6 @@ async function startServer() {
     serverUsers.splice(index, 1);
     console.log(`[SRMS SECURITY AUDIT] User ${deletedUser.name} (${deletedUser.id} / ${deletedUser.role}) was DELETED. Sessions revoked.`);
 
-    saveUsersToDisk();
-
     return res.json({
       success: true,
       message: `User ${deletedUser.name} (${deletedUser.role}) has been permanently deleted.`,
@@ -741,7 +637,6 @@ async function startServer() {
           !u.email?.endsWith("@srms.in"))
     );
     console.log("[SRMS SECURITY AUDIT] Server purged demo users and stale mock data.");
-    saveUsersToDisk();
     return res.json({ success: true, message: "Demo data purged successfully on server." });
   });
 
@@ -1589,8 +1484,17 @@ Provide in JSON format:
   // ==========================================
   // SHARED MASTER DATA STORAGE ACROSS ALL LOGINS
   // ==========================================
+  const MASTER_STORE_DIR = path.join(process.cwd(), "data");
+  const MASTER_STORE_FILE = path.join(MASTER_STORE_DIR, "srms_master_store.json");
+
+  // In-memory master data container
+  let serverMasterStore: Record<string, any> = {};
+
   // Load persisted master data from disk if available
   try {
+    if (!fs.existsSync(MASTER_STORE_DIR)) {
+      fs.mkdirSync(MASTER_STORE_DIR, { recursive: true });
+    }
     if (fs.existsSync(MASTER_STORE_FILE)) {
       const content = fs.readFileSync(MASTER_STORE_FILE, "utf-8");
       serverMasterStore = JSON.parse(content);
@@ -1602,16 +1506,10 @@ Provide in JSON format:
 
   // GET Shared Master Data
   app.get("/api/master-data/get", (req, res) => {
-    // Merge persisted users into masterData response so client state is always synchronized
-    const combinedMasterData = {
-      ...serverMasterStore,
-      users: serverUsers.map(sanitizeUser),
-    };
-
     res.json({
       success: true,
-      hasData: Object.keys(combinedMasterData).length > 0,
-      masterData: combinedMasterData,
+      hasData: Object.keys(serverMasterStore).length > 0,
+      masterData: serverMasterStore,
       updatedAt: serverMasterStore._updatedAt || null,
     });
   });
@@ -1631,7 +1529,7 @@ Provide in JSON format:
         _updatedAt: new Date().toISOString(),
       };
 
-      // Explicitly support setting accounts, recoveries, ptps, photos, archivedAccounts, banks, and users if passed in data
+      // Explicitly support setting accounts, recoveries, ptps, photos, archivedAccounts, and banks if passed in data
       if (Array.isArray(data.accounts)) {
         serverMasterStore.accounts = data.accounts;
       }
@@ -1649,34 +1547,6 @@ Provide in JSON format:
       }
       if (Array.isArray(data.photos)) {
         serverMasterStore.photos = data.photos;
-      }
-      if (Array.isArray(data.users)) {
-        serverMasterStore.users = data.users;
-        // Also update serverUsers with any newly added users
-        data.users.forEach((clientUser: any) => {
-          if (!clientUser || (!clientUser.id && !clientUser.username && !clientUser.agentId)) return;
-          const idx = serverUsers.findIndex(
-            (u) =>
-              (clientUser.id && u.id === clientUser.id) ||
-              (clientUser.username && u.username.toLowerCase() === clientUser.username.toLowerCase()) ||
-              (clientUser.agentId && u.agentId && u.agentId.toLowerCase() === clientUser.agentId.toLowerCase())
-          );
-          if (idx >= 0) {
-            serverUsers[idx] = { ...serverUsers[idx], ...clientUser };
-          } else {
-            const salt = clientUser.passwordSalt || generateSalt(16);
-            const pwd = clientUser.password || "Agent@2026";
-            const hash = clientUser.passwordHash || hashPassword(pwd, salt);
-            serverUsers.push({
-              ...clientUser,
-              passwordSalt: salt,
-              passwordHash: hash,
-              tokenVersion: 1,
-              active: clientUser.active !== undefined ? clientUser.active : true,
-            });
-          }
-        });
-        saveUsersToDisk();
       }
 
       // Persist to disk asynchronously
@@ -1831,161 +1701,6 @@ Provide in JSON format:
       success: true,
       message: "All raw visits, recoveries, PTPs, demo agent assignments, and customer accounts wiped successfully.",
       updatedAt: serverMasterStore._updatedAt,
-    });
-  });
-
-  // ==========================================
-  // SERVER-SIDE AGGREGATIONS & BACKEND DATA APIS
-  // Offloads heavy calculations from client browser
-  // ==========================================
-
-  // GET Server-side Aggregate Statistics
-  app.get("/api/master-data/stats", (req, res) => {
-    try {
-      const accounts = Array.isArray(serverMasterStore.accounts) ? serverMasterStore.accounts : [];
-      const recoveries = Array.isArray(serverMasterStore.recoveries) ? serverMasterStore.recoveries : [];
-      const ptps = Array.isArray(serverMasterStore.ptps) ? serverMasterStore.ptps : [];
-      const visits = Array.isArray(serverMasterStore.visits) ? serverMasterStore.visits : [];
-      const allocations = Array.isArray(serverMasterStore.allocations) ? serverMasterStore.allocations : [];
-
-      let totalOutstanding = 0;
-      let totalOverdue = 0;
-      const stageCounts: Record<string, number> = {};
-      const branchCounts: Record<string, number> = {};
-      const zoneCounts: Record<string, number> = {};
-
-      for (let i = 0; i < accounts.length; i++) {
-        const a = accounts[i];
-        totalOutstanding += Number(a.outstandingAmount || 0);
-        totalOverdue += Number(a.overdueAmount || 0);
-
-        const st = a.accountStatus || "Pending";
-        stageCounts[st] = (stageCounts[st] || 0) + 1;
-
-        const br = a.branch || "Head Office";
-        branchCounts[br] = (branchCounts[br] || 0) + 1;
-
-        const zn = a.zone || "Default Zone";
-        zoneCounts[zn] = (zoneCounts[zn] || 0) + 1;
-      }
-
-      let totalRecovered = 0;
-      let totalCommission = 0;
-      for (let i = 0; i < recoveries.length; i++) {
-        const r = recoveries[i];
-        if (!r.isReversed) {
-          totalRecovered += Number(r.amount || 0);
-          totalCommission += Number(r.commissionAmount || 0);
-        }
-      }
-
-      let storeFileSizeBytes = 0;
-      try {
-        if (fs.existsSync(MASTER_STORE_FILE)) {
-          storeFileSizeBytes = fs.statSync(MASTER_STORE_FILE).size;
-        }
-      } catch {}
-
-      return res.json({
-        success: true,
-        stats: {
-          totalAccounts: accounts.length,
-          totalOutstanding,
-          totalOverdue,
-          totalRecovered,
-          totalCommission,
-          totalPtps: ptps.length,
-          totalVisits: visits.length,
-          totalAllocations: allocations.length,
-          stageCounts,
-          branchCounts,
-          zoneCounts,
-          storageFileSizeBytes: storeFileSizeBytes,
-          storageFileSizeFormatted: `${(storeFileSizeBytes / (1024 * 1024)).toFixed(2)} MB`,
-          serverUptimeSeconds: Math.floor(process.uptime()),
-          updatedAt: serverMasterStore._updatedAt || null,
-        },
-      });
-    } catch (err: any) {
-      return res.status(500).json({ success: false, error: err.message || "Failed to calculate stats on server." });
-    }
-  });
-
-  // POST Direct Batch Save of Accounts on Backend Server
-  app.post("/api/accounts/batch-save", (req, res) => {
-    try {
-      const { accounts: incomingAccounts, replaceAll } = req.body;
-      if (!Array.isArray(incomingAccounts)) {
-        return res.status(400).json({ success: false, error: "Invalid payload: accounts must be an array." });
-      }
-
-      if (replaceAll) {
-        serverMasterStore.accounts = incomingAccounts;
-      } else {
-        const existing = Array.isArray(serverMasterStore.accounts) ? serverMasterStore.accounts : [];
-        const accMap = new Map<string, any>();
-        for (const a of existing) {
-          accMap.set(a.accountId || a.id, a);
-        }
-        for (const a of incomingAccounts) {
-          accMap.set(a.accountId || a.id, a);
-        }
-        serverMasterStore.accounts = Array.from(accMap.values());
-      }
-
-      serverMasterStore._updatedAt = new Date().toISOString();
-
-      fs.writeFile(MASTER_STORE_FILE, JSON.stringify(serverMasterStore, null, 2), (err) => {
-        if (err) console.warn("[SRMS MASTER DATA] Error saving accounts to disk:", err);
-      });
-
-      console.log(`[SRMS MASTER DATA] Saved ${incomingAccounts.length} accounts to server master store. Total accounts now: ${serverMasterStore.accounts.length}`);
-
-      return res.json({
-        success: true,
-        totalAccounts: serverMasterStore.accounts.length,
-        message: `Successfully saved ${incomingAccounts.length} accounts to central backend database.`,
-        updatedAt: serverMasterStore._updatedAt,
-      });
-    } catch (err: any) {
-      return res.status(500).json({ success: false, error: err.message || "Failed to save accounts to server." });
-    }
-  });
-
-  // GET Backend System Health & Diagnostics
-  app.get("/api/backend/diagnostics", (req, res) => {
-    const mem = process.memoryUsage();
-    let fileSize = 0;
-    try {
-      if (fs.existsSync(MASTER_STORE_FILE)) {
-        fileSize = fs.statSync(MASTER_STORE_FILE).size;
-      }
-    } catch {}
-
-    res.json({
-      success: true,
-      status: "HEALTHY",
-      platform: "Node.js Container",
-      memoryUsageMB: {
-        rss: Math.round(mem.rss / 1024 / 1024),
-        heapUsed: Math.round(mem.heapUsed / 1024 / 1024),
-        heapTotal: Math.round(mem.heapTotal / 1024 / 1024),
-      },
-      counts: {
-        accounts: serverMasterStore.accounts?.length || 0,
-        recoveries: serverMasterStore.recoveries?.length || 0,
-        ptps: serverMasterStore.ptps?.length || 0,
-        visits: serverMasterStore.visits?.length || 0,
-        users: serverUsers.length,
-      },
-      storageFile: {
-        path: MASTER_STORE_FILE,
-        exists: fs.existsSync(MASTER_STORE_FILE),
-        sizeBytes: fileSize,
-        sizeFormatted: `${(fileSize / (1024 * 1024)).toFixed(2)} MB`,
-      },
-      serverTime: new Date().toISOString(),
-      uptimeSeconds: Math.floor(process.uptime()),
     });
   });
 
