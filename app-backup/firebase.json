@@ -1,0 +1,23 @@
+{
+  "hosting": {
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/api/**",
+        "destination": "https://us-central1-scalesupport-52efd.cloudfunctions.net/:function",
+        "type": 301
+      }
+    ]
+  }
+}

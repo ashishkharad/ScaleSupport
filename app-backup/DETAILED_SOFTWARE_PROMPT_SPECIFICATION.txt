@@ -1,0 +1,187 @@
+================================================================================
+          COMPLETE SOFTWARE SPECIFICATION PROMPT & ARCHITECTURE BLUEPRINT
+   STRESSED ASSET RECOVERY MANAGEMENT SYSTEM (SRMS) - POWERED BY SCALESUPPORT
+================================================================================
+
+[SYSTEM OVERVIEW & PURPOSE]
+Build a comprehensive, enterprise-grade, full-stack Stressed Asset Recovery Management System (SRMS) branded as "ScaleSupport". The platform digitizes, automates, and accelerates non-performing asset (NPA) and loan collection workflows for banks, NBFCs, collection agencies, and recovery agents. It features a responsive Web Recovery Coordinator Portal and an Android Mobile Field Recovery Application, backed by real-time Google Sheets database synchronization (19 structured sheets), Google Drive cloud evidence storage, AI recovery intelligence, offline-ready field collection tools, and multi-account borrower reconciliation.
+
+--------------------------------------------------------------------------------
+1. BRAND IDENTITY & THEME DESIGN SYSTEM
+--------------------------------------------------------------------------------
+- Brand Name: ScaleSupport / SRMS (Stressed Asset Recovery Management System)
+- Slogan / Tagline: "Empowering Growth, Accelerating Stressed Asset Recovery"
+- Visual Logo: Custom high-precision SVG/Canvas scale-and-growth shield icon with dual-arm balance symbol, ascending recovery bars, navy/gold/indigo accents.
+- Color Palette:
+  * Primary: Deep Indigo (#1E1B4B / #312E81) and Slate Navy (#0F172A)
+  * Accents: Emerald Green (#059669 - Recovered), Amber (#D97706 - PTP / Due Today), Rose Red (#E11D48 - Broken / NPA Risk), Cyan/Blue (#0284C7 - Drive & Sheets)
+  * Neutrals: Clean Off-White slate background (#F8FAFC), crisp white containers (#FFFFFF), refined borders (#E2E8F0).
+- Typography: Plus Jakarta Sans / Inter display styling with high-contrast legibility, monospace formatting for monetary figures (INR ₹ format: ₹#,##,###) and account identifiers.
+
+--------------------------------------------------------------------------------
+2. ARCHITECTURAL TOPOLOGY & USER ROLES (RBAC)
+--------------------------------------------------------------------------------
+Role-Based Access Control:
+1. Super Admin: Full system control, branch/zone configuration, commission structure overrides, user provisioning, master Google Drive/Sheets setup, full audit trail.
+2. Area Manager: Multi-branch monitoring, allocation approvals, zone performance tracking, team targets, batch PTP digest executions.
+3. Branch Manager: Local branch allocations, recovery review, PTP approvals, field visit re-assignments, customer single-view inspection.
+4. Recovery Agent (Field Executive): Dedicated Android Mobile app interface, daily route planner, priority calling queue, GPS watermark camera, audio voice notes, instant receipt generation, offline PTP/recovery collection.
+
+--------------------------------------------------------------------------------
+3. DATA MODELS & SCHEMA SPECIFICATIONS (TYPESCRIPT)
+--------------------------------------------------------------------------------
+- Account:
+  * accountId, customerName, branchCode, branchName, productDescription, facility, sanctionLimit, loanBalance, npaDate, mobile, alternateMobile, customerId, address, city, area, zone, assignedAgentId, assignedAgentName, allocationDate, overdueAmount, totalPaidAmount, outstandingAmount, dpd (Days Past Due), bucket (SMA-0, SMA-1, SMA-2, NPA, Critical), accountStatus, ptpStatus, ptpDate, ptpAmount, lastFollowUpDate, lastFollowUpStatus, customerCategory, agentNotes (array of Note objects), linkedAccountIds, isMultipleAccount, totalOverdueConsolidated.
+- Agent Note:
+  * id, accountId, agentId, agentName, date, time, note, category ('General' | 'PTP' | 'PTP Commitment' | 'Dispute' | 'Address Verification' | 'Legal' | 'Field Visit' | 'Follow Up' | 'Payment Collection').
+- PTP Record (Promise-to-Pay):
+  * id, accountId, customerName, agentId, agentName, amount, ptpDate, ptpMode ('UPI' | 'Cash' | 'Cheque' | 'Branch Pay' | 'Net Banking'), customerCommitment, remarks, status ('Pending' | 'Achieved' | 'Broken' | 'Cancelled'), createdAt, resolvedDate.
+- Recovery Record:
+  * id, accountId, customerName, agentId, agentName, amount, mode ('Cash' | 'UPI' | 'Cheque' | 'DD' | 'NEFT'), receiptNumber, transactionRef, date, time, status ('Pending Verification' | 'Verified' | 'Rejected'), verifiedBy, customerPhone, remarks.
+- Field Visit:
+  * id, accountId, customerName, agentId, agentName, date, time, visitType ('Home' | 'Office' | 'Guarantor' | 'Third Party'), customerMet (boolean), outcome, locationLat, locationLng, addressVisited, photoUrl, audioNoteUrl, signatureUrl, nextAction.
+- Watermarked Photo:
+  * id, accountId, customerName, agentId, agentName, date, time, photoType ('Borrower House' | 'Business Premises' | 'Collateral Asset' | 'Customer Meet' | 'Cheque / Document'), imageUrl, gpsLatitude, gpsLongitude, gpsAccuracy, addressTag, watermarkText.
+- Voice Note:
+  * id, accountId, customerName, agentId, agentName, date, time, durationSeconds, audioUrl, transcript, noteType.
+
+--------------------------------------------------------------------------------
+4. DUAL APPLICATION INTERFACES
+--------------------------------------------------------------------------------
+
+A. WEB ADMINISTRATION & RECOVERY COORDINATOR PORTAL:
+- Navigation Modules (Left Sidebar & Top Global Bar):
+  1. Dashboard & Operations KPI Command Center (Total Pool Overdue, Recoveries, Active PTPs, Agent Leaderboard, Recovery Trends via Recharts).
+  2. Accounts Master Directory (Multi-filtering by Branch, Bucket, PTP Status, Multiple Account indicator, inline "+ Note", "Single View" modal, "Timeline" drawer).
+  3. Dynamic Excel Account Import & Allocation Engine (Drag-and-drop file upload, automatic column header matching, real-time preview, single/bulk allocation to agents).
+  4. Agent Allocation & Team Assignment Hub.
+  5. Promise to Pay (PTP) Master Directory (Live status pills: All, Pending, Expired Overdue, Due Today, Broken, Achieved).
+  6. Recovery Transactions & Receipt Ledger.
+  7. Field Visits & GPS Location Verification Log.
+  8. Evidence Locker (Watermarked Geo-Photos & Audio Voice Notes).
+  9. Google Sheets 19-Tab Real-Time Sync Center (Interactive tab inspector, cell grid viewer, OAuth sync status).
+  10. Google Drive Hierarchy Explorer (Zone -> Branch -> Account folder tree).
+  11. Agent Performance, Targets & Incentives.
+  12. Commission & Settlement Slab Rules.
+  13. System Users & RBAC Administration.
+  14. Audit Log & Real-Time Event Timeline.
+
+B. AGENT ANDROID MOBILE FIELD APP (PWA / MOBILE INTERFACE):
+- Optimized for field executives on smartphones with native-feel navigation:
+  1. Top App Bar: Agent Profile, Active Zone, Offline Status, Sync status, Emergency contact.
+  2. Floating Action Quick Menu: "+ Log PTP", "+ Record Recovery", "📷 Geo Camera", "🎙️ Voice Note", "🔍 Search CIF".
+  3. Bottom Navigation Tabs:
+     - Today's Queue & Priority Route: Top overdue borrowers, PTPs due today, GPS navigation triggers.
+     - Accounts & Borrower Search: Complete assigned directory with quick Call, WhatsApp, Map, and Single-View actions.
+     - Field Collection Tools: Instant receipt generator, cash reconciliation, QR payment display.
+     - Geo Evidence: Camera with overlay watermark (Time, Lat/Lng, Account, Agent) and Voice memo recorder.
+     - Agent Profile & Earnings: Target vs. achievement meter, commission tier earned, sync manager.
+
+--------------------------------------------------------------------------------
+5. CORE SPECIALIZED ENGINES & WORKFLOWS
+--------------------------------------------------------------------------------
+
+1. EXCEL IMPORT & DYNAMIC ALLOCATION ENGINE:
+- Supports banking standard raw export files (CSV, XLS, XLSX).
+- Automatically maps 9 core bank columns + flexible aliases:
+  * BR_CD (Branch Code)
+  * BR_NAME (Branch Name)
+  * AC_NO (Account Number)
+  * AC_NAME (Customer / Borrower Name)
+  * PROD_DESC (Product Description e.g., KCC, LAP, HL, AL, PL, TW)
+  * FACILITY (Facility Type)
+  * SANC_LIM (Sanction Limit)
+  * LOAN_B (Loan Balance / Overdue Balance)
+  * NPA_DT (Date of NPA Classification)
+- Performs automatic type coercion, currency sanitization, deduplication, and bulk agent assignment.
+
+2. MULTIPLE ACCOUNT MATCHING & CONSOLIDATED BORROWER SINGLE VIEW:
+- Automatic detection of borrowers holding multiple credit facilities across branches.
+- Matching heuristics: Identical Customer ID / CIF, or identical Contact Phone, or matching Loan Balance + NPA Date combination.
+- "Single View" Customer Modal (`CustomerConsolidatedDetailModal.tsx`):
+  * Displays complete 360° Borrower Profile (Total Pool Overdue, Active/Broken Status, Sanctioned Credit).
+  * Linked Accounts Table with breakdown of individual loans, facilities, and branch codes.
+  * Direct action buttons to Log PTP across accounts, Collect Consolidated Recovery, Attach Notes, Upload Docs, or Trigger AI Settlement Strategy.
+
+3. AGENT NOTES MANAGEMENT ENGINE:
+- Quick "+ Note" modal and inline inputs across all accounts and timeline views.
+- Categorized notes: 'PTP Commitment', 'Field Visit', 'Dispute', 'Address Verification', 'Follow Up', 'Payment Collection'.
+- Persistent logging attached to account records and synced to Google Sheets Tab 4 & Tab 6.
+
+4. PTP DIGEST & GOOGLE SHEETS BATCH AUTO-RESOLVER:
+- Interactive "⚡ PTP Digest" notification button on the Dashboard and PTP management hub.
+- Compares all 'Pending' PTP commitments against the current reference date.
+- Identifies expired promises (promised date < current date).
+- 1-Click Batch Execution:
+  * Transitions expired commitments from 'Pending' to 'Broken'.
+  * Updates the corresponding Account status to 'PTP Broken'.
+  * Generates high-priority coordinator notifications and system audit logs.
+  * Synchronizes all 19 Google Sheets database tabs in a single batch request.
+  * Provides detailed metrics: Total Evaluated, Expired Broken, Due Today (Actionable), Upcoming, and Achieved.
+  * Features a copyable executive summary report.
+
+5. 19-TAB GOOGLE SHEETS DATABASE ARCHITECTURE:
+Full structured synchronization with Google Sheets encompassing 19 dedicated tabs:
+  - Sheet 1: Users (User ID, Name, Role, Branch, Agent ID, Mobile, Status)
+  - Sheet 2: Agents (Agent ID, Name, Branch, Area, Monthly Target, Status)
+  - Sheet 3: Customers (Account ID, Customer Name, Mobile, Address, City, Category)
+  - Sheet 4: Accounts (Branch, Account ID, Product, Sanction, Balance, NPA Date, PTP Count, Status)
+  - Sheet 5: Allocations (Allocation ID, Account ID, Agent ID, Date, Priority, Status)
+  - Sheet 6: FollowUps (FollowUp ID, Account ID, Agent ID, Date, Contact Mode, Disposition, Next Date)
+  - Sheet 7: PTP (PTP ID, Account ID, Customer Name, Agent ID, Amount, PTP Date, Mode, Status)
+  - Sheet 8: Recoveries (Recovery ID, Account ID, Amount, Mode, Receipt No, Txn Ref, Date, Status)
+  - Sheet 9: FieldVisits (Visit ID, Account ID, Agent ID, Date, Visit Type, Met, GPS Coordinates, Outcome)
+  - Sheet 10: GeoPhotos (Photo ID, Account ID, Photo Type, GPS Lat/Lng, Timestamp, Storage URL)
+  - Sheet 11: VoiceNotes (Voice ID, Account ID, Agent ID, Duration, Date, Audio URL, Transcript)
+  - Sheet 12: Documents (Doc ID, Account ID, Doc Type, Upload Date, Verified, File URL)
+  - Sheet 13: ActivityLogs (Log ID, Timestamp, User ID, Role, Action Type, Details)
+  - Sheet 14: Notifications (Notif ID, Timestamp, Recipient, Title, Type, Read Status)
+  - Sheet 15: AgentCommissions (Commission ID, Agent ID, Recovery ID, Amount, Rate, Incentive, Status)
+  - Sheet 16: Branches (Branch Code, Branch Name, Area, Zone, Manager Name, Total Accounts)
+  - Sheet 17: Areas (Area Code, Area Name, Zone, Regional Head, Total Branches)
+  - Sheet 18: Zones (Zone Code, Zone Name, Zonal Head, Total Areas)
+  - Sheet 19: CommissionSettings (Slab Name, Min Amount, Max Amount, Base Rate %, Bonus %)
+
+6. GOOGLE DRIVE CLOUD HIERARCHY STORAGE:
+- Automatic folder structure: `/ScaleSupport_SRMS / [Zone] / [Branch] / [Account_ID - Customer_Name] /`
+- Sub-folders organized into `Geo_Photos/`, `Voice_Notes/`, `Payment_Receipts/`, and `Legal_Documents/`.
+- File metadata tagging and direct preview links.
+
+7. WATERMARK CAMERA & GEO-VERIFICATION:
+- HTML5 Canvas & Geolocation API engine.
+- Captures live camera stream and burns indelible metadata directly onto the image:
+  * ScaleSupport Verified Recovery Watermark
+  * Account Number & Borrower Name
+  * Recovery Agent ID & Agent Name
+  * Precise GPS Latitude, Longitude, and Altitude
+  * Date and Time Stamp (IST / Local time)
+  * Digital Hash for tamper prevention
+
+8. VOICE NOTE AUDIO RECORDER:
+- Web Audio API / MediaRecorder implementation.
+- Real-time sound wave visualization, pause/resume, playback scrubber.
+- Generates base64 / audio blob with local fallback and cloud sync.
+
+9. AI RECOVERY INTELLIGENCE DRAWER:
+- Integration with Gemini API / AI reasoning engine.
+- Generates tailored recovery strategies based on:
+  * Days past due (DPD) & NPA Age
+  * Loan balance & asset category
+  * Previous PTP breach history & customer sentiment
+  * Suggested settlement discount concessions (OTS - One Time Settlement)
+  * Legal escalation recommendations (SARFAESI, Section 138, Lok Adalat, DRT).
+
+--------------------------------------------------------------------------------
+6. TECHNICAL STACK & IMPLEMENTATION DETAILS
+--------------------------------------------------------------------------------
+- Framework: React 18+ with TypeScript (Vite bundler)
+- Styling: Tailwind CSS (with bespoke glassmorphism, responsive grids, mobile-first drawer modals)
+- State Management: React Context API (`SRMSContext.tsx`) with localStorage caching & Google Sheets live bridge
+- Icons: `lucide-react`
+- Charts & Visualizations: `recharts` and SVG-based gauge indicators
+- Export Utilities: XLSX/CSV parsing and generation, PDF printable receipts, Clipboard report generator
+- Verification: Full TypeScript compilation without errors, strict null checks, zero runtime crashes.
+
+================================================================================
+END OF SPECIFICATION PROMPT
+================================================================================

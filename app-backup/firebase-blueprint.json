@@ -1,0 +1,268 @@
+{
+  "entities": {
+    "Account": {
+      "title": "Account",
+      "description": "Borrower loan account for recovery management",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "accountId": { "type": "string", "maxLength": 128 },
+        "loanNumber": { "type": "string", "maxLength": 128 },
+        "customerName": { "type": "string", "maxLength": 256 },
+        "mobile": { "type": "string", "maxLength": 32 },
+        "address": { "type": "string", "maxLength": 512 },
+        "city": { "type": "string", "maxLength": 128 },
+        "branch": { "type": "string", "maxLength": 128 },
+        "loanType": { "type": "string", "maxLength": 128 },
+        "sanctionAmount": { "type": "number" },
+        "outstandingAmount": { "type": "number" },
+        "overdueAmount": { "type": "number" },
+        "emi": { "type": "number" },
+        "customerCategory": { "type": "string", "maxLength": 128 },
+        "accountStatus": { "type": "string", "maxLength": 128 },
+        "assignedAgentId": { "type": "string", "maxLength": 128 },
+        "assignedAgentName": { "type": "string", "maxLength": 128 },
+        "coordinatorId": { "type": "string", "maxLength": 128 },
+        "coordinatorName": { "type": "string", "maxLength": 128 },
+        "allocationDate": { "type": "string", "maxLength": 64 },
+        "totalRecovered": { "type": "number" },
+        "latestRemark": { "type": "string", "maxLength": 1024 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "accountId", "customerName"]
+    },
+    "RecoveryRecord": {
+      "title": "RecoveryRecord",
+      "description": "Payment collection or recovery receipt logged by an agent or coordinator",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "recoveryId": { "type": "string", "maxLength": 128 },
+        "accountId": { "type": "string", "maxLength": 128 },
+        "customerName": { "type": "string", "maxLength": 256 },
+        "agentId": { "type": "string", "maxLength": 128 },
+        "agentName": { "type": "string", "maxLength": 128 },
+        "amount": { "type": "number" },
+        "recoveryDate": { "type": "string", "maxLength": 64 },
+        "referenceNumber": { "type": "string", "maxLength": 128 },
+        "paymentMode": { "type": "string", "maxLength": 64 },
+        "receiptNumber": { "type": "string", "maxLength": 128 },
+        "commissionAmount": { "type": "number" },
+        "commissionPaidStatus": { "type": "string", "maxLength": 64 },
+        "remarks": { "type": "string", "maxLength": 1024 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "accountId", "amount", "recoveryDate"]
+    },
+    "FollowUp": {
+      "title": "FollowUp",
+      "description": "Telecalling remark or discussion record with borrower",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "accountId": { "type": "string", "maxLength": 128 },
+        "customerName": { "type": "string", "maxLength": 256 },
+        "agentId": { "type": "string", "maxLength": 128 },
+        "agentName": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 64 },
+        "time": { "type": "string", "maxLength": 64 },
+        "status": { "type": "string", "maxLength": 128 },
+        "customerResponse": { "type": "string", "maxLength": 512 },
+        "agentRemarks": { "type": "string", "maxLength": 1024 },
+        "nextFollowUpDate": { "type": "string", "maxLength": 64 },
+        "nextFollowUpTime": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "accountId", "date", "status"]
+    },
+    "PTPRecord": {
+      "title": "PTPRecord",
+      "description": "Promise to Pay commitment made by borrower",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "accountId": { "type": "string", "maxLength": 128 },
+        "customerName": { "type": "string", "maxLength": 256 },
+        "agentId": { "type": "string", "maxLength": 128 },
+        "agentName": { "type": "string", "maxLength": 128 },
+        "amount": { "type": "number" },
+        "ptpDate": { "type": "string", "maxLength": 64 },
+        "ptpMode": { "type": "string", "maxLength": 64 },
+        "customerCommitment": { "type": "string", "maxLength": 1024 },
+        "status": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "accountId", "amount", "ptpDate"]
+    },
+    "FieldVisit": {
+      "title": "FieldVisit",
+      "description": "On-ground field inspection and customer meeting details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "visitId": { "type": "string", "maxLength": 128 },
+        "accountId": { "type": "string", "maxLength": 128 },
+        "customerName": { "type": "string", "maxLength": 256 },
+        "agentId": { "type": "string", "maxLength": 128 },
+        "agentName": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 64 },
+        "startTime": { "type": "string", "maxLength": 64 },
+        "endTime": { "type": "string", "maxLength": 64 },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "address": { "type": "string", "maxLength": 512 },
+        "visitStatus": { "type": "string", "maxLength": 128 },
+        "visitRemarks": { "type": "string", "maxLength": 1024 }
+      },
+      "required": ["id", "accountId", "date", "visitStatus"]
+    },
+    "User": {
+      "title": "User",
+      "description": "Application team member profile and permissions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "username": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 256 },
+        "email": { "type": "string", "maxLength": 256 },
+        "role": { "type": "string", "maxLength": 64 },
+        "branch": { "type": "string", "maxLength": 128 },
+        "area": { "type": "string", "maxLength": 128 },
+        "zone": { "type": "string", "maxLength": 128 },
+        "agentId": { "type": "string", "maxLength": 64 },
+        "mobile": { "type": "string", "maxLength": 32 },
+        "active": { "type": "boolean" },
+        "status": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "name", "role"]
+    },
+    "PhotoRecord": {
+      "title": "PhotoRecord",
+      "description": "Geotagged visit and panchnama photo metadata with Google Drive pointer",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "photoId": { "type": "string", "maxLength": 128 },
+        "accountId": { "type": "string", "maxLength": 128 },
+        "customerId": { "type": "string", "maxLength": 128 },
+        "agentId": { "type": "string", "maxLength": 128 },
+        "agentName": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 64 },
+        "time": { "type": "string", "maxLength": 64 },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "visitId": { "type": "string", "maxLength": 128 },
+        "agentRemark": { "type": "string", "maxLength": 1024 },
+        "driveFileId": { "type": "string", "maxLength": 256 },
+        "driveFolder": { "type": "string", "maxLength": 512 },
+        "uploadStatus": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "accountId", "photoId"]
+    },
+    "VoiceNoteRecord": {
+      "title": "VoiceNoteRecord",
+      "description": "Audio voice note recording metadata with Google Drive pointer",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "voiceNoteId": { "type": "string", "maxLength": 128 },
+        "accountId": { "type": "string", "maxLength": 128 },
+        "agentId": { "type": "string", "maxLength": 128 },
+        "agentName": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 64 },
+        "time": { "type": "string", "maxLength": 64 },
+        "durationSeconds": { "type": "number" },
+        "visitId": { "type": "string", "maxLength": 128 },
+        "driveFileId": { "type": "string", "maxLength": 256 },
+        "driveFolder": { "type": "string", "maxLength": 512 },
+        "webViewLink": { "type": "string", "maxLength": 512 },
+        "title": { "type": "string", "maxLength": 256 },
+        "transcription": { "type": "string", "maxLength": 2048 }
+      },
+      "required": ["id", "accountId", "voiceNoteId"]
+    },
+    "DocumentRecord": {
+      "title": "DocumentRecord",
+      "description": "Document and KYC file metadata with Google Drive pointer",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "documentId": { "type": "string", "maxLength": 128 },
+        "accountId": { "type": "string", "maxLength": 128 },
+        "customerName": { "type": "string", "maxLength": 256 },
+        "documentType": { "type": "string", "maxLength": 128 },
+        "uploadedBy": { "type": "string", "maxLength": 128 },
+        "uploadedByName": { "type": "string", "maxLength": 128 },
+        "dateTime": { "type": "string", "maxLength": 64 },
+        "driveFileId": { "type": "string", "maxLength": 256 },
+        "fileName": { "type": "string", "maxLength": 256 },
+        "fileSizeBytes": { "type": "number" },
+        "fileUrl": { "type": "string", "maxLength": 512 }
+      },
+      "required": ["id", "accountId", "documentId"]
+    },
+    "CommissionRecord": {
+      "title": "CommissionRecord",
+      "description": "Agent commission calculation and settlement ledger record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "agentId": { "type": "string", "maxLength": 128 },
+        "agentName": { "type": "string", "maxLength": 128 },
+        "recoveryId": { "type": "string", "maxLength": 128 },
+        "accountId": { "type": "string", "maxLength": 128 },
+        "recoveryAmount": { "type": "number" },
+        "rate": { "type": "number" },
+        "commissionAmount": { "type": "number" },
+        "status": { "type": "string", "maxLength": 64 },
+        "date": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "agentId", "commissionAmount"]
+    }
+  },
+  "firestore": {
+    "/accounts/{accountId}": {
+      "schema": { "$ref": "#/entities/Account" },
+      "description": "Collection of borrower loan accounts for recovery tracking"
+    },
+    "/recoveries/{recoveryId}": {
+      "schema": { "$ref": "#/entities/RecoveryRecord" },
+      "description": "Collection of payment recoveries and receipts recorded by agents and administrators"
+    },
+    "/followups/{followupId}": {
+      "schema": { "$ref": "#/entities/FollowUp" },
+      "description": "Call logs, agent remarks, and follow-up interaction history"
+    },
+    "/ptps/{ptpId}": {
+      "schema": { "$ref": "#/entities/PTPRecord" },
+      "description": "Promise To Pay commitments made by borrowers"
+    },
+    "/visits/{visitId}": {
+      "schema": { "$ref": "#/entities/FieldVisit" },
+      "description": "Field visit records including geolocation coordinates and inspection status"
+    },
+    "/photos/{photoId}": {
+      "schema": { "$ref": "#/entities/PhotoRecord" },
+      "description": "Geotagged photos with Google Drive file pointer IDs"
+    },
+    "/voicenotes/{voiceNoteId}": {
+      "schema": { "$ref": "#/entities/VoiceNoteRecord" },
+      "description": "Audio voice notes with Google Drive file pointer IDs"
+    },
+    "/documents/{documentId}": {
+      "schema": { "$ref": "#/entities/DocumentRecord" },
+      "description": "Uploaded KYC and SARFAESI documents with Google Drive file pointer IDs"
+    },
+    "/commissions/{commissionId}": {
+      "schema": { "$ref": "#/entities/CommissionRecord" },
+      "description": "Commission calculation records and payouts"
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Registered agents, recovery officers, coordinators, and administrators"
+    },
+    "/settings/{settingId}": {
+      "schema": { "type": "object" },
+      "description": "Shared system settings including active Google Sheets and Google Apps Script configuration"
+    }
+  }
+}
