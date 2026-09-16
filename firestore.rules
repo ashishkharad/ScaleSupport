@@ -1,0 +1,179 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened global helper functions
+    // SECURITY FIX: previously this only checked "is anyone signed in",
+    // and the app auto-signed every visitor in anonymously — meaning
+    // anyone could read all data without ever logging in. Anonymous
+    // sign-in has been removed from the app, and this now also rejects
+    // any anonymous session outright as a second layer of defense.
+    function isSignedIn() {
+      return request.auth != null &&
+        request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\.]+$');
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'Ashish.kharad2@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    // Connection testing endpoint
+    match /test/connection {
+      allow read: if true;
+    }
+
+    // Shared System Settings (e.g. Google Sheets / Apps Script URL config)
+    // SECURITY FIX: was open to read/write by anyone on the internet with
+    // no login at all. Now requires a real logged-in session.
+    match /settings/{settingId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // Accounts Collection
+    match /accounts/{accountId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(accountId) &&
+        incoming().id is string && incoming().id.size() <= 128 &&
+        incoming().accountId is string && incoming().accountId.size() <= 128 &&
+        incoming().customerName is string && incoming().customerName.size() <= 256;
+      allow update: if isSignedIn() && isValidId(accountId) &&
+        (isAdmin() || (incoming().id == existing().id && incoming().accountId == existing().accountId));
+      allow delete: if isAdmin();
+    }
+
+    // Recoveries Collection
+    match /recoveries/{recoveryId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(recoveryId) &&
+        incoming().id is string && incoming().id.size() <= 128 &&
+        incoming().accountId is string && incoming().accountId.size() <= 128 &&
+        incoming().amount is number && incoming().amount >= 0;
+      allow update: if isSignedIn() && isValidId(recoveryId) &&
+        (isAdmin() || (incoming().id == existing().id && incoming().accountId == existing().accountId));
+      allow delete: if isAdmin();
+    }
+
+    // Follow-ups Collection
+    match /followups/{followupId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(followupId) &&
+        incoming().id is string && incoming().id.size() <= 128 &&
+        incoming().accountId is string && incoming().accountId.size() <= 128;
+      allow update: if isSignedIn() && isValidId(followupId) &&
+        (isAdmin() || incoming().id == existing().id);
+      allow delete: if isAdmin();
+    }
+
+    // PTP Records Collection
+    match /ptps/{ptpId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(ptpId) &&
+        incoming().id is string && incoming().id.size() <= 128 &&
+        incoming().accountId is string && incoming().accountId.size() <= 128 &&
+        incoming().amount is number;
+      allow update: if isSignedIn() && isValidId(ptpId) &&
+        (isAdmin() || incoming().id == existing().id);
+      allow delete: if isAdmin();
+    }
+
+    // Field Visits Collection
+    match /visits/{visitId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(visitId) &&
+        incoming().id is string && incoming().id.size() <= 128 &&
+        incoming().accountId is string && incoming().accountId.size() <= 128;
+      allow update: if isSignedIn() && isValidId(visitId) &&
+        (isAdmin() || incoming().id == existing().id);
+      allow delete: if isAdmin();
+    }
+
+    // Geotagged Photos Collection (Metadata with Google Drive File ID pointer - No binary files in Firebase)
+    match /photos/{photoId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(photoId) &&
+        incoming().id is string && incoming().id.size() <= 128 &&
+        incoming().accountId is string && incoming().accountId.size() <= 128;
+      allow update: if isSignedIn() && isValidId(photoId) &&
+        (isAdmin() || incoming().id == existing().id);
+      allow delete: if isAdmin();
+    }
+
+    // Audio Voice Notes Collection (Metadata with Google Drive File ID pointer - No binary files in Firebase)
+    match /voicenotes/{voiceNoteId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(voiceNoteId) &&
+        incoming().id is string && incoming().id.size() <= 128 &&
+        incoming().accountId is string && incoming().accountId.size() <= 128;
+      allow update: if isSignedIn() && isValidId(voiceNoteId) &&
+        (isAdmin() || incoming().id == existing().id);
+      allow delete: if isAdmin();
+    }
+
+    // KYC & Evidence Documents Collection (Metadata with Google Drive File ID pointer - No binary files in Firebase)
+    match /documents/{documentId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(documentId) &&
+        incoming().id is string && incoming().id.size() <= 128 &&
+        incoming().accountId is string && incoming().accountId.size() <= 128;
+      allow update: if isSignedIn() && isValidId(documentId) &&
+        (isAdmin() || incoming().id == existing().id);
+      allow delete: if isAdmin();
+    }
+
+    // Agent Commission Ledger Collection
+    match /commissions/{commissionId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(commissionId);
+      allow update: if isSignedIn() && isValidId(commissionId);
+      allow delete: if isAdmin();
+    }
+
+    // Account Allocations Collection
+    match /allocations/{allocationId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(allocationId);
+      allow update: if isSignedIn() && isValidId(allocationId);
+      allow delete: if isAdmin();
+    }
+
+    // Allocation history collection
+    match /allocationHistories/{historyId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(historyId);
+      allow delete: if isAdmin();
+    }
+
+    // Users Collection
+    // Admins may manage all user profiles. Non-admin users may only read/update
+    // their own profile. Password fields should not be used by the client for
+    // authentication; the Firebase Function validates credentials server-side.
+    match /users/{userId} {
+      allow read: if isSignedIn() && (isAdmin() || request.auth.uid == userId);
+      allow create: if isSignedIn() && (isAdmin() || request.auth.uid == userId);
+      allow update: if isSignedIn() && (isAdmin() || request.auth.uid == userId);
+      allow delete: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "ScaleSupport - Recovery & Allocation System",
+  "description": "ScaleSupport Debt Recovery Management & Account Allocation System with Excel/CSV batch allocation, Android Agent App & Web Portal, Geo-tagged Watermark Camera, Audio Notes, PTP & Collection tracking, and Google Sheets & Drive Data Layer.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
