@@ -21,11 +21,6 @@ import {
   DocumentRecord,
   User,
   CommissionRecord,
-<<<<<<< HEAD
-  AccountAllocation,
-  AllocationHistory,
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
 } from '../types';
 
 export interface FirestoreSpeedStats {
@@ -269,65 +264,6 @@ class FirebaseFirestoreService {
     );
   }
 
-<<<<<<< HEAD
-  public subscribeAllocations(callback: (items: AccountAllocation[]) => void): () => void {
-    ensureFirebaseAuth();
-    return onSnapshot(collection(db, 'allocations'), (snapshot) => {
-      const items: AccountAllocation[] = [];
-      snapshot.forEach((docSnap) => items.push(docSnap.data() as AccountAllocation));
-      callback(items);
-    }, (error) => console.warn('Firestore allocations listener fallback:', error.message));
-  }
-
-  public subscribeAllocationHistories(callback: (items: AllocationHistory[]) => void): () => void {
-    ensureFirebaseAuth();
-    return onSnapshot(collection(db, 'allocationHistories'), (snapshot) => {
-      const items: AllocationHistory[] = [];
-      snapshot.forEach((docSnap) => items.push(docSnap.data() as AllocationHistory));
-      callback(items);
-    }, (error) => console.warn('Firestore allocation history listener fallback:', error.message));
-  }
-
-  // ==========================================
-  // AUTHORITATIVE READS (used after login)
-  // ==========================================
-
-  private async getAll<T>(collectionName: string): Promise<T[]> {
-    await ensureFirebaseAuth();
-    const snapshot = await getDocs(collection(db, collectionName));
-    return snapshot.docs.map((snap) => snap.data() as T);
-  }
-
-  public async getAllAccounts(): Promise<Account[]> {
-    return this.getAll<Account>('accounts');
-  }
-
-  public async getAllRecoveries(): Promise<RecoveryRecord[]> {
-    return this.getAll<RecoveryRecord>('recoveries');
-  }
-
-  public async getAllUsers(): Promise<User[]> {
-    return this.getAll<User>('users');
-  }
-
-  public async getAllAllocations(): Promise<AccountAllocation[]> {
-    return this.getAll<AccountAllocation>('allocations');
-  }
-
-  public async getAllAllocationHistories(): Promise<AllocationHistory[]> {
-    return this.getAll<AllocationHistory>('allocationHistories');
-  }
-
-  public async getAllPTPs(): Promise<PTPRecord[]> {
-    return this.getAll<PTPRecord>('ptps');
-  }
-
-  public async getAllVisits(): Promise<FieldVisit[]> {
-    return this.getAll<FieldVisit>('visits');
-  }
-
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
   // ==========================================
   // FAST MUTATIONS (< 50ms) + AUTO-SHEET QUEUE
   // ==========================================
@@ -335,27 +271,6 @@ class FirebaseFirestoreService {
   /**
    * Primary write for loan account with auto-replicate to Google Sheets
    */
-<<<<<<< HEAD
-  public async saveAllocation(allocation: AccountAllocation): Promise<void> {
-    const start = performance.now();
-    await ensureFirebaseAuth();
-    const docId = allocation.id || `ALC-${Date.now()}`;
-    const cleanData = sanitizeForFirestore({ ...allocation, id: docId });
-    await setDoc(doc(db, 'allocations', docId), cleanData, { merge: true });
-    this.recordLatency(start);
-  }
-
-  public async saveAllocationHistory(history: AllocationHistory): Promise<void> {
-    const start = performance.now();
-    await ensureFirebaseAuth();
-    const docId = history.id || `ALH-${Date.now()}`;
-    const cleanData = sanitizeForFirestore({ ...history, id: docId });
-    await setDoc(doc(db, 'allocationHistories', docId), cleanData, { merge: true });
-    this.recordLatency(start);
-  }
-
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
   public async saveAccount(account: Account): Promise<void> {
     const start = performance.now();
     await ensureFirebaseAuth();
@@ -566,12 +481,7 @@ class FirebaseFirestoreService {
     await ensureFirebaseAuth();
 
     const docId = user.id;
-<<<<<<< HEAD
-    const { password, ...userWithoutPlainPassword } = user as User & { password?: string };
-    const cleanData = sanitizeForFirestore(userWithoutPlainPassword);
-=======
     const cleanData = sanitizeForFirestore(user);
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
 
     await setDoc(doc(db, 'users', docId), cleanData, { merge: true });
     this.recordLatency(start);
@@ -586,120 +496,6 @@ class FirebaseFirestoreService {
     await ensureFirebaseAuth();
     await deleteDoc(doc(db, 'recoveries', recoveryDocId));
   }
-<<<<<<< HEAD
-=======
-
-  /**
-   * Remark Management - Save remarks permanently in Firestore
-   */
-  public async saveRemark(remark: any): Promise<void> {
-    const start = performance.now();
-    await ensureFirebaseAuth();
-
-    const remarkId = remark.remarkId || `REM-${Date.now()}`;
-    const cleanData = sanitizeForFirestore({
-      ...remark,
-      remarkId,
-      createdAt: remark.createdAt || new Date().toISOString(),
-    });
-
-    await setDoc(doc(db, 'remarks', remarkId), cleanData, { merge: true });
-    this.recordLatency(start);
-  }
-
-  public async getRemarksForAccount(accountId: string): Promise<any[]> {
-    const start = performance.now();
-    await ensureFirebaseAuth();
-
-    const q = query(
-      collection(db, 'remarks'),
-      where('accountId', '==', accountId)
-    );
-    const snap = await getDocs(q);
-    this.recordLatency(start);
-
-    return snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-  }
-
-  public async getRemarksForAgent(agentId: string): Promise<any[]> {
-    const start = performance.now();
-    await ensureFirebaseAuth();
-
-    const q = query(
-      collection(db, 'remarks'),
-      where('agentId', '==', agentId)
-    );
-    const snap = await getDocs(q);
-    this.recordLatency(start);
-
-    return snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-  }
-
-  public async deleteRemark(remarkId: string): Promise<void> {
-    await ensureFirebaseAuth();
-    await deleteDoc(doc(db, 'remarks', remarkId));
-  }
-
-  /**
-   * Account Assignment Management - Handle agent deletion and reassignment
-   */
-  public async assignAccountToAgent(
-    accountId: string,
-    agentId: string,
-    agentName: string
-  ): Promise<void> {
-    const start = performance.now();
-    await ensureFirebaseAuth();
-
-    const accountRef = doc(db, 'accounts', accountId);
-    await updateDoc(accountRef, {
-      assignedAgentId: agentId,
-      assignedAgentName: agentName,
-      isUnassigned: false,
-      updatedAt: new Date().toISOString(),
-    });
-
-    this.recordLatency(start);
-  }
-
-  public async unassignAccountsForAgent(agentId: string): Promise<void> {
-    const start = performance.now();
-    await ensureFirebaseAuth();
-
-    const q = query(
-      collection(db, 'accounts'),
-      where('assignedAgentId', '==', agentId)
-    );
-    const snap = await getDocs(q);
-    const batch = writeBatch(db);
-
-    snap.docs.forEach(doc => {
-      batch.update(doc.ref, {
-        assignedAgentId: null,
-        assignedAgentName: null,
-        isUnassigned: true,
-        updatedAt: new Date().toISOString(),
-      });
-    });
-
-    await batch.commit();
-    this.recordLatency(start);
-  }
-
-  public async getAllUnassignedAccounts(): Promise<Account[]> {
-    const start = performance.now();
-    await ensureFirebaseAuth();
-
-    const q = query(
-      collection(db, 'accounts'),
-      where('isUnassigned', '==', true)
-    );
-    const snap = await getDocs(q);
-    this.recordLatency(start);
-
-    return snap.docs.map(doc => doc.data() as Account);
-  }
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
 }
 
 export const firebaseFirestoreService = new FirebaseFirestoreService();

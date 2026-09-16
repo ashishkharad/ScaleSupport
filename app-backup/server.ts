@@ -100,20 +100,6 @@ async function startServer() {
   const deptSalt = "srms_dept_salt_0001";
   const branchMgrSalt = "srms_bm_salt_0001";
 
-<<<<<<< HEAD
-  const USER_STORE_DIR = path.join(process.cwd(), "data");
-  const USER_STORE_FILE = path.join(USER_STORE_DIR, "srms_users.json");
-  const persistServerUsers = () => {
-    try {
-      if (!fs.existsSync(USER_STORE_DIR)) fs.mkdirSync(USER_STORE_DIR, { recursive: true });
-      fs.writeFileSync(USER_STORE_FILE, JSON.stringify(serverUsers, null, 2), "utf-8");
-    } catch (err) {
-      console.warn("[SRMS USERS] Could not persist users:", err);
-    }
-  };
-
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
   let serverUsers: ServerUser[] = [
     {
       id: "USR-ADMIN-1",
@@ -134,23 +120,6 @@ async function startServer() {
     },
   ];
 
-<<<<<<< HEAD
-  // Restore previously created users so local/server restarts do not erase accounts.
-  try {
-    if (fs.existsSync(USER_STORE_FILE)) {
-      const storedUsers = JSON.parse(fs.readFileSync(USER_STORE_FILE, "utf-8"));
-      if (Array.isArray(storedUsers)) {
-        const byId = new Map(serverUsers.map((u) => [u.id, u]));
-        for (const stored of storedUsers) byId.set(stored.id, stored);
-        serverUsers = Array.from(byId.values());
-      }
-    }
-  } catch (err) {
-    console.warn("[SRMS USERS] Could not load persisted users:", err);
-  }
-
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
   // In-memory security and session stores
   const activeSessions = new Map<string, ActiveSession>();
   const otpRecords = new Map<string, OTPRecord>();
@@ -544,10 +513,6 @@ async function startServer() {
     user.passwordSalt = newSalt;
     user.passwordHash = hashPassword(newPassword.trim(), newSalt);
     user.tokenVersion = (user.tokenVersion || 1) + 1;
-<<<<<<< HEAD
-    persistServerUsers();
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
 
     // Revoke all existing sessions for this user
     for (const [token, session] of activeSessions.entries()) {
@@ -586,10 +551,6 @@ async function startServer() {
       });
     }
 
-<<<<<<< HEAD
-    persistServerUsers();
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     return res.json({ success: true, message: `User ${user.name} synchronized with server.` });
   });
 
@@ -603,10 +564,6 @@ async function startServer() {
     }
 
     user.active = !user.active;
-<<<<<<< HEAD
-    persistServerUsers();
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
 
     // IF DEACTIVATED: Immediately revoke all active sessions for this user
     if (!user.active) {
@@ -649,10 +606,6 @@ async function startServer() {
     }
 
     serverUsers.splice(index, 1);
-<<<<<<< HEAD
-    persistServerUsers();
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     console.log(`[SRMS SECURITY AUDIT] User ${deletedUser.name} (${deletedUser.id} / ${deletedUser.role}) was DELETED. Sessions revoked.`);
 
     return res.json({
@@ -683,10 +636,6 @@ async function startServer() {
           !u.email?.endsWith("@srms-recovery.in") &&
           !u.email?.endsWith("@srms.in"))
     );
-<<<<<<< HEAD
-    persistServerUsers();
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     console.log("[SRMS SECURITY AUDIT] Server purged demo users and stale mock data.");
     return res.json({ success: true, message: "Demo data purged successfully on server." });
   });

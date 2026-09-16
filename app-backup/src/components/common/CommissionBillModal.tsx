@@ -44,10 +44,6 @@ export const CommissionBillModal: React.FC<CommissionBillModalProps> = ({
     return currentUser;
   }, [targetAgentId, users, currentUser]);
 
-<<<<<<< HEAD
-  // Agent PAN card is kept only for the current bill form unless stored in the cloud profile.
-  const [panCardNo, setPanCardNo] = useState<string>('');
-=======
   // Agent PAN card state (editable and persisted in localStorage)
   const [panCardNo, setPanCardNo] = useState<string>(() => {
     return (
@@ -55,7 +51,6 @@ export const CommissionBillModal: React.FC<CommissionBillModalProps> = ({
       'CCYPK5511Q'
     );
   });
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
 
   const [agentMobile, setAgentMobile] = useState<string>(() => {
     return effectiveAgent.mobile || '9657922770';
@@ -182,10 +177,7 @@ export const CommissionBillModal: React.FC<CommissionBillModalProps> = ({
   const handlePanChange = (val: string) => {
     const formatted = val.toUpperCase().trim();
     setPanCardNo(formatted);
-<<<<<<< HEAD
-=======
     localStorage.setItem(`srms_pan_${effectiveAgent.agentId || effectiveAgent.id}`, formatted);
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
   };
 
   const handleDownloadLandscapePDF = () => {

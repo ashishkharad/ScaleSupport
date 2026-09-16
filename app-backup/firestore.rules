@@ -86,21 +86,6 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-<<<<<<< HEAD
-=======
-    // Remarks Collection - Permanent storage of customer remarks/notes
-    match /remarks/{remarkId} {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn() && isValidId(remarkId) &&
-        incoming().accountId is string && incoming().accountId.size() <= 128 &&
-        incoming().agentId is string && incoming().agentId.size() <= 128 &&
-        incoming().remarkText is string && incoming().remarkText.size() <= 1000;
-      allow update: if isSignedIn() && isValidId(remarkId) &&
-        (isAdmin() || incoming().agentId == existing().agentId);
-      allow delete: if isAdmin();
-    }
-
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     // PTP Records Collection
     match /ptps/{ptpId} {
       allow read: if isSignedIn();
@@ -173,25 +158,9 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-<<<<<<< HEAD
-    // Allocation history collection
-    match /allocationHistories/{historyId} {
-      allow read: if isSignedIn();
-      allow create, update: if isSignedIn() && isValidId(historyId);
-      allow delete: if isAdmin();
-    }
-
-    // Users Collection
-    // Admins may manage all user profiles. Non-admin users may only read/update
-    // their own profile. Password fields should not be used by the client for
-    // authentication; the Firebase Function validates credentials server-side.
-    match /users/{userId} {
-      allow read: if isSignedIn() && (isAdmin() || request.auth.uid == userId);
-=======
     // Users Collection
     match /users/{userId} {
       allow read: if isSignedIn();
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
       allow create: if isSignedIn() && (isAdmin() || request.auth.uid == userId);
       allow update: if isSignedIn() && (isAdmin() || request.auth.uid == userId);
       allow delete: if isAdmin();

@@ -8,26 +8,10 @@
     ],
     "rewrites": [
       {
-<<<<<<< HEAD
-        "source": "/api/auth/login",
-        "function": {
-          "functionId": "authLogin",
-          "region": "us-central1"
-        }
-      },
-      {
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
         "source": "**",
         "destination": "/index.html"
       }
     ],
-<<<<<<< HEAD
-    "redirects": []
-  },
-  "functions": {
-    "source": "functions"
-=======
     "redirects": [
       {
         "source": "/api/**",
@@ -35,6 +19,5 @@
         "type": 301
       }
     ]
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
   }
 }

@@ -68,7 +68,6 @@ import { createSRMSWatermarkedPhoto, WatermarkOptions } from '../utils/watermark
 import {
   compileAll19GoogleSheets,
   generateGoogleDriveHierarchy,
-<<<<<<< HEAD
 } from '../utils/googleSheetsManager';
 import { googleDriveService } from '../utils/googleDriveService';
 import { googleSheetsService } from '../utils/googleSheetsService';
@@ -76,16 +75,6 @@ import { PickedDriveFile } from '../utils/googlePickerService';
 import { isMatchingAccountNumber, exportAllBackendDataToExcel } from '../utils/excelAccountImporter';
 import { firebaseFirestoreService, FirestoreSpeedStats } from '../services/firebaseFirestoreService';
 import { sheetSyncQueue, SheetQueueStatus } from '../services/sheetSyncQueue';
-=======
-// DISABLED: Google integrations - using Firestore only as backend
-// } from '../utils/googleSheetsManager';
-// import { googleDriveService } from '../utils/googleDriveService';
-// import { googleSheetsService } from '../utils/googleSheetsService';
-// import { PickedDriveFile } from '../utils/googlePickerService';
-import { isMatchingAccountNumber, exportAllBackendDataToExcel } from '../utils/excelAccountImporter';
-import { firebaseFirestoreService, FirestoreSpeedStats } from '../services/firebaseFirestoreService';
-// ===== FIRESTORE ONLY - No local storage, no Google integrations =====
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
 import {
   hashPasswordSync,
   generateSalt,
@@ -401,11 +390,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const loadSaved = <T,>(key: string, fallback: T): T => {
-<<<<<<< HEAD
-    // Business data is cloud-only. Never hydrate application records from browser storage.
-    if (key.startsWith('srms_persisted_') || key === 'srms_deleted_users' || key === 'srms_archived_accounts') return fallback;
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     try {
       const saved = localStorage.getItem(key);
       if (!saved) return fallback;
@@ -416,11 +400,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-<<<<<<< HEAD
-  // Business data is cloud-only. Do not seed, purge, or hydrate it from browser storage.
-  const [users, setUsers] = useState<User[]>([]);
-  const [deletedUsers, setDeletedUsers] = useState<User[]>([]);
-=======
   // Complete permanent purge flag for all demo data (zones, banks, branch managers, regions, and delete timestamps)
   const PURGE_DEMO_DATA_KEY = 'srms_demo_data_purged_complete_v6';
   if (typeof window !== 'undefined' && localStorage.getItem(PURGE_DEMO_DATA_KEY) !== 'true') {
@@ -474,7 +453,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('srms_deleted_users', JSON.stringify(deletedUsers));
     } catch {}
   }, [deletedUsers]);
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
 
   const [currentUser, setCurrentUser] = useState<User>(() => {
     try {
@@ -500,34 +478,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setStoredSessionItem('srms_device_mode', mode);
   };
 
-<<<<<<< HEAD
-  // All submitted business records are read from Firestore; browser storage is not a source of truth.
-  const isUserClearedAccounts = false;
-  const isUserCleared = false;
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [allocations, setAllocations] = useState<AccountAllocation[]>([]);
-  const [allocationHistories, setAllocationHistories] = useState<AllocationHistory[]>([]);
-  const [followups, setFollowups] = useState<FollowUp[]>([]);
-  const [ptps, setPtps] = useState<PTPRecord[]>([]);
-  const [recoveries, setRecoveries] = useState<RecoveryRecord[]>([]);
-  const [visits, setVisits] = useState<FieldVisit[]>([]);
-  const [photos, setPhotos] = useState<PhotoRecord[]>([]);
-  const [voiceNotes, setVoiceNotes] = useState<VoiceNoteRecord[]>([]);
-  const [documents, setDocuments] = useState<DocumentRecord[]>([]);
-  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [commissions, setCommissions] = useState<CommissionRecord[]>([]);
-  const [commissionSettings, setCommissionSettings] = useState<CommissionSettings>(initialCommissionSettings);
-  const [branches, setBranches] = useState<Branch[]>([]);
-  const [areas, setAreas] = useState<Area[]>([]);
-  const [zones, setZones] = useState<Zone[]>([]);
-  const [banks, setBanks] = useState<Bank[]>([]);
-  const [recoveryDepartments, setRecoveryDepartments] = useState<RecoveryDepartment[]>([]);
-  const [commissionRules, setCommissionRules] = useState<CommissionRule[]>(initialCommissionRules);
-  const [userCommissionAssignments, setUserCommissionAssignments] = useState<UserCommissionAssignment[]>([]);
-  const [commissionAuditLogs, setCommissionAuditLogs] = useState<CommissionAuditLog[]>(initialCommissionAuditLogs);
-  const [archivedAccounts, setArchivedAccounts] = useState<Account[]>([]);
-=======
   const isPurged = typeof window !== 'undefined' && localStorage.getItem(PURGE_DEMO_DATA_KEY) === 'true';
   const isUserClearedAccounts = typeof window !== 'undefined' && localStorage.getItem('srms_account_storage_cleared_user') === 'true';
 
@@ -557,7 +507,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userCommissionAssignments, setUserCommissionAssignments] = useState<UserCommissionAssignment[]>(() => isPurged ? loadSaved('srms_persisted_user_assignments', []) : []);
   const [commissionAuditLogs, setCommissionAuditLogs] = useState<CommissionAuditLog[]>(() => loadSaved('srms_persisted_comm_audit_logs', initialCommissionAuditLogs));
   const [archivedAccounts, setArchivedAccounts] = useState<Account[]>(() => loadSaved<Account[]>('srms_archived_accounts', []));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
 
   // OTS Scheme Authorized Roles & WhatsApp Offer Logs
   // Authorized roles include users, agents, branch managers, and admin
@@ -569,205 +518,124 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     'coordinator',
     'agent',
   ];
-<<<<<<< HEAD
-  const [otsAuthorizedRoles, setOtsAuthorizedRoles] = useState<UserRole[]>(defaultOTSAuthorizedRoles);
-  const [whatsAppLogs, setWhatsAppLogs] = useState<WhatsAppOfferLog[]>([]);
-=======
   const [otsAuthorizedRoles, setOtsAuthorizedRoles] = useState<UserRole[]>(() =>
     loadSaved('srms_ots_authorized_roles', defaultOTSAuthorizedRoles)
   );
   const [whatsAppLogs, setWhatsAppLogs] = useState<WhatsAppOfferLog[]>(() =>
     loadSaved('srms_whatsapp_offer_logs', [])
   );
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
 
   // Sync state changes to localStorage
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_ots_authorized_roles', JSON.stringify(otsAuthorizedRoles));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [otsAuthorizedRoles]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_whatsapp_offer_logs', JSON.stringify(whatsAppLogs));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [whatsAppLogs]);
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_banks', JSON.stringify(banks));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [banks]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_departments', JSON.stringify(recoveryDepartments));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [recoveryDepartments]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_branches', JSON.stringify(branches));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [branches]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_areas', JSON.stringify(areas));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [areas]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_zones', JSON.stringify(zones));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [zones]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_commission_rules', JSON.stringify(commissionRules));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [commissionRules]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_user_assignments', JSON.stringify(userCommissionAssignments));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [userCommissionAssignments]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_comm_audit_logs', JSON.stringify(commissionAuditLogs));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [commissionAuditLogs]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_accounts', JSON.stringify(accounts));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [accounts]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_allocations', JSON.stringify(allocations));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [allocations]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_allochistories', JSON.stringify(allocationHistories));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [allocationHistories]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_followups', JSON.stringify(followups));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [followups]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_ptps', JSON.stringify(ptps));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [ptps]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_recoveries', JSON.stringify(recoveries));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [recoveries]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_visits', JSON.stringify(visits));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [visits]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_activitylogs', JSON.stringify(activityLogs));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [activityLogs]);
 
   useEffect(() => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_notifications', JSON.stringify(notifications));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
   }, [notifications]);
 
@@ -812,9 +680,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const unsubAccounts = firebaseFirestoreService.subscribeAccounts((fsAccounts) => {
       if (!isSubscribed) return;
-<<<<<<< HEAD
-      setAccounts(fsAccounts || []);
-=======
       if (fsAccounts && fsAccounts.length > 0) {
         setAccounts((prev) => {
           const map = new Map<string, Account>(prev.map((a) => [a.accountId, a]));
@@ -825,14 +690,10 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return Array.from(map.values());
         });
       }
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     });
 
     const unsubRecoveries = firebaseFirestoreService.subscribeRecoveries((fsRecs) => {
       if (!isSubscribed) return;
-<<<<<<< HEAD
-      setRecoveries(fsRecs || []);
-=======
       if (fsRecs && fsRecs.length > 0) {
         setRecoveries((prev) => {
           const map = new Map<string, RecoveryRecord>(prev.map((r) => [r.id || r.recoveryId, r]));
@@ -844,14 +705,10 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return Array.from(map.values());
         });
       }
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     });
 
     const unsubPtps = firebaseFirestoreService.subscribePTPs((fsPtps) => {
       if (!isSubscribed) return;
-<<<<<<< HEAD
-      setPtps(fsPtps || []);
-=======
       if (fsPtps && fsPtps.length > 0) {
         setPtps((prev) => {
           const map = new Map<string, PTPRecord>(prev.map((p) => [p.id, p]));
@@ -862,14 +719,10 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return Array.from(map.values());
         });
       }
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     });
 
     const unsubFollowups = firebaseFirestoreService.subscribeFollowUps((fsFlws) => {
       if (!isSubscribed) return;
-<<<<<<< HEAD
-      setFollowups(fsFlws || []);
-=======
       if (fsFlws && fsFlws.length > 0) {
         setFollowups((prev) => {
           const map = new Map<string, FollowUp>(prev.map((f) => [f.id, f]));
@@ -880,14 +733,10 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return Array.from(map.values());
         });
       }
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     });
 
     const unsubVisits = firebaseFirestoreService.subscribeVisits((fsVisits) => {
       if (!isSubscribed) return;
-<<<<<<< HEAD
-      setVisits(fsVisits || []);
-=======
       if (fsVisits && fsVisits.length > 0) {
         setVisits((prev) => {
           const map = new Map<string, FieldVisit>(prev.map((v) => [v.id || v.visitId, v]));
@@ -899,14 +748,10 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return Array.from(map.values());
         });
       }
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     });
 
     const unsubPhotos = firebaseFirestoreService.subscribePhotos((fsPhotos) => {
       if (!isSubscribed) return;
-<<<<<<< HEAD
-      setPhotos(fsPhotos || []);
-=======
       if (fsPhotos && fsPhotos.length > 0) {
         setPhotos((prev) => {
           const map = new Map<string, PhotoRecord>(prev.map((p) => [p.id || p.photoId, p]));
@@ -918,14 +763,10 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return Array.from(map.values());
         });
       }
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     });
 
     const unsubVoiceNotes = firebaseFirestoreService.subscribeVoiceNotes((fsVns) => {
       if (!isSubscribed) return;
-<<<<<<< HEAD
-      setVoiceNotes(fsVns || []);
-=======
       if (fsVns && fsVns.length > 0) {
         setVoiceNotes((prev) => {
           const map = new Map<string, VoiceNoteRecord>(prev.map((vn) => [vn.id || vn.voiceNoteId, vn]));
@@ -937,14 +778,10 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return Array.from(map.values());
         });
       }
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     });
 
     const unsubDocs = firebaseFirestoreService.subscribeDocuments((fsDocs) => {
       if (!isSubscribed) return;
-<<<<<<< HEAD
-      setDocuments(fsDocs || []);
-=======
       if (fsDocs && fsDocs.length > 0) {
         setDocuments((prev) => {
           const map = new Map<string, DocumentRecord>(prev.map((d) => [d.id || d.documentId, d]));
@@ -956,24 +793,10 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return Array.from(map.values());
         });
       }
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     });
 
     const unsubUsers = firebaseFirestoreService.subscribeUsers((fsUsers) => {
       if (!isSubscribed) return;
-<<<<<<< HEAD
-      setUsers(fsUsers || []);
-    });
-
-    const unsubAllocations = firebaseFirestoreService.subscribeAllocations((items) => {
-      if (!isSubscribed) return;
-      setAllocations(items || []);
-    });
-
-    const unsubAllocationHistories = firebaseFirestoreService.subscribeAllocationHistories((items) => {
-      if (!isSubscribed) return;
-      setAllocationHistories(items || []);
-=======
       if (fsUsers && fsUsers.length > 0) {
         setUsers((prev) => {
           const map = new Map<string, User>(prev.map((u) => [u.id, u]));
@@ -984,7 +807,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return Array.from(map.values());
         });
       }
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     });
 
     return () => {
@@ -998,11 +820,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       unsubVoiceNotes();
       unsubDocs();
       unsubUsers();
-<<<<<<< HEAD
-      unsubAllocations();
-      unsubAllocationHistories();
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     };
   }, [isAuthenticated]);
 
@@ -1061,12 +878,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // ==========================================
   // FORCE FRESH DATA LOAD FROM FIRESTORE ON LOGIN
   // ==========================================
-<<<<<<< HEAD
-  // Firestore is authoritative after authentication. Browser storage is never used as a source of business data.
-  const firestoreHydratedRef = useRef(false);
-
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
   const forceFreshDataLoad = useCallback(async () => {
     try {
       console.log('🔄 Forcing fresh data load from Firestore...');
@@ -1074,31 +885,13 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Read from Firestore collections
       const accountsSnap = await firebaseFirestoreService.getAllAccounts();
       const recoveriesSnap = await firebaseFirestoreService.getAllRecoveries();
-<<<<<<< HEAD
-      const allocationsSnap = await firebaseFirestoreService.getAllAllocations();
-      const allocationHistoriesSnap = await firebaseFirestoreService.getAllAllocationHistories();
-=======
       const usersSnap = await firebaseFirestoreService.getAllUsers();
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
       const ptpsSnap = await firebaseFirestoreService.getAllPTPs();
       const visitsSnap = await firebaseFirestoreService.getAllVisits();
       
       // Update state with fresh data
       setAccounts(accountsSnap || []);
       setRecoveries(recoveriesSnap || []);
-<<<<<<< HEAD
-      setAllocations(allocationsSnap || []);
-      setAllocationHistories(allocationHistoriesSnap || []);
-      setPtps(ptpsSnap || []);
-      setVisits(visitsSnap || []);
-      
-      firestoreHydratedRef.current = true;
-      console.log('✅ Fresh data loaded from Firestore');
-      console.log('📊 Accounts:', accountsSnap?.length || 0);
-      console.log('💰 Recoveries:', recoveriesSnap?.length || 0);
-    } catch (err) {
-      firestoreHydratedRef.current = false;
-=======
       setUsers(usersSnap || []);
       setPtps(ptpsSnap || []);
       setVisits(visitsSnap || []);
@@ -1108,7 +901,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('💰 Recoveries:', recoveriesSnap?.length || 0);
       console.log('👥 Users:', usersSnap?.length || 0);
     } catch (err) {
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
       console.error('Error loading fresh data from Firestore:', err);
     }
   }, []);
@@ -1117,9 +909,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // SHARED MASTER DATA STORAGE ACROSS ALL LOGINS
   // ==========================================
   const pullSharedMasterData = useCallback(async (): Promise<{ success: boolean; message: string }> => {
-<<<<<<< HEAD
-    return { success: true, message: 'Firestore is the authoritative shared database.' };
-=======
     try {
       const res = await fetch('/api/master-data/get');
       if (!res.ok) return { success: false, message: 'Server responded with error' };
@@ -1180,16 +969,11 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.warn('[SRMS MASTER DATA] Pull error:', err);
       return { success: false, message: err?.message || 'Sync failed' };
     }
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
   }, []);
 
   const pushSharedMasterData = useCallback(async (overrides?: Record<string, any>): Promise<{ success: boolean; message: string }> => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       const isUserCleared = typeof window !== 'undefined' && localStorage.getItem('srms_account_storage_cleared_user') === 'true';
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
       const payload = {
         accounts: isUserCleared && accounts.length === 0 ? [] : accounts,
         allocations: isUserCleared && accounts.length === 0 ? [] : allocations,
@@ -1257,14 +1041,11 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     whatsAppLogs,
   ]);
 
-<<<<<<< HEAD
-=======
   // Initial pull from central shared store on component mount
   useEffect(() => {
     pullSharedMasterData();
   }, [pullSharedMasterData]);
 
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
   // Debounced push to central shared store whenever master data updates
   useEffect(() => {
     if (isInitialMount.current) {
@@ -1304,11 +1085,7 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // actually makes accounts and users shared across different logins.
   const accountsSyncTimerRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
-<<<<<<< HEAD
-    if (!isAuthenticated || !firestoreHydratedRef.current) return;
-=======
     if (!isAuthenticated) return;
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     if (accountsSyncTimerRef.current) clearTimeout(accountsSyncTimerRef.current);
     accountsSyncTimerRef.current = setTimeout(() => {
       accounts.forEach((acc) => {
@@ -1322,26 +1099,9 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [accounts, isAuthenticated]);
 
-<<<<<<< HEAD
-  const allocationsSyncTimerRef = useRef<NodeJS.Timeout | null>(null);
-  useEffect(() => {
-    if (!isAuthenticated || !firestoreHydratedRef.current) return;
-    if (allocationsSyncTimerRef.current) clearTimeout(allocationsSyncTimerRef.current);
-    allocationsSyncTimerRef.current = setTimeout(() => {
-      allocations.forEach((item) => firebaseFirestoreService.saveAllocation(item).catch((err) => console.warn('Firestore allocation sync warning:', err)));
-      allocationHistories.forEach((item) => firebaseFirestoreService.saveAllocationHistory(item).catch((err) => console.warn('Firestore allocation history sync warning:', err)));
-    }, 500);
-    return () => { if (allocationsSyncTimerRef.current) clearTimeout(allocationsSyncTimerRef.current); };
-  }, [allocations, allocationHistories, isAuthenticated]);
-
-  const usersSyncTimerRef = useRef<NodeJS.Timeout | null>(null);
-  useEffect(() => {
-    if (!isAuthenticated || !firestoreHydratedRef.current) return;
-=======
   const usersSyncTimerRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     if (!isAuthenticated) return;
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     if (usersSyncTimerRef.current) clearTimeout(usersSyncTimerRef.current);
     usersSyncTimerRef.current = setTimeout(() => {
       users.forEach((u) => {
@@ -1355,8 +1115,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [users, isAuthenticated]);
 
-<<<<<<< HEAD
-=======
   // Periodic background pull to ensure multiple active users/devices stay in lockstep
   useEffect(() => {
     if (!isAuthenticated || !autoSyncEnabled) return;
@@ -1365,7 +1123,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, 20000);
     return () => clearInterval(interval);
   }, [isAuthenticated, autoSyncEnabled, pullSharedMasterData]);
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
 
   // Periodic session security verification
   useEffect(() => {
@@ -1956,164 +1713,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     passwordInput: string,
     targetMode?: 'web' | 'android'
   ): Promise<AuthResult> => {
-<<<<<<< HEAD
-    try {
-      // VALIDATION
-      if (!inputIdentifier || !inputIdentifier.trim()) {
-        return { success: false, error: 'Please enter your User ID or registered Email.' };
-      }
-      if (!passwordInput || !passwordInput.trim()) {
-        return { success: false, error: 'Please enter your Password.' };
-      }
-
-      const cleanInput = inputIdentifier.trim();
-      const cleanPassword = passwordInput.trim();
-      const lowerInput = cleanInput.toLowerCase();
-
-      console.log('🔐 Login attempt:', cleanInput);
-
-      // STEP 1: Fetch all users from Firestore (NOT from local state!)
-      console.log('📥 Fetching users from Firestore...');
-      const usersSnap = await firebaseFirestoreService.getAllUsersFromFirestore();
-      
-      if (!usersSnap || usersSnap.length === 0) {
-        console.error('❌ No users found in Firestore');
-        return { success: false, error: 'Invalid User ID or Password. Login is locked to admin-created users only.' };
-      }
-
-      console.log('✅ Found', usersSnap.length, 'users in Firestore');
-
-      // STEP 2: Find user by username, agentId, email, or ID (exact match)
-      let user = usersSnap.find((u) => {
-        const uUsername = (u.username || '').toLowerCase();
-        const uEmail = (u.email || '').toLowerCase();
-        const uId = (u.id || '').toLowerCase();
-        const uAgentId = (u.agentId || '').toLowerCase();
-
-        return (
-          uUsername === lowerInput ||
-          uEmail === lowerInput ||
-          uId === lowerInput ||
-          uAgentId === lowerInput
-        );
-      });
-
-      if (!user || isDemoUser(user)) {
-        console.error('❌ User not found in Firestore:', cleanInput);
-        return {
-          success: false,
-          error: 'Invalid User ID or Password. Login is locked to admin-created users only.',
-          code: 'USER_NOT_CREATED_BY_ADMIN',
-        };
-      }
-
-      console.log('✅ User found:', user.name);
-
-      // STEP 3: DEACTIVATION CHECK
-      if (!user.active || (user as any).isDeleted || (user as any).status === 'DELETED') {
-        return {
-          success: false,
-          error: 'Your account is currently deactivated or has been removed. Please contact the administrator.',
-          code: 'ACCOUNT_DEACTIVATED',
-        };
-      }
-
-      // STEP 4: STRICT PASSWORD VERIFICATION
-      const salt = user.passwordSalt || 'srms_default_salt';
-      const computedHash = hashPasswordSync(cleanPassword, salt);
-      const isExactHashMatch = !!(user.passwordHash && computedHash === user.passwordHash);
-      const isExactPlainMatch = !!(user.password && user.password === cleanPassword);
-      const isPrimaryAdminDefault =
-        user.role === 'admin' &&
-        (user.id === 'USR-ADMIN-1' || user.email?.toLowerCase() === 'ashish.kharad2@gmail.com') &&
-        (cleanPassword === 'Admin@2026' || cleanPassword === 'admin@2026');
-
-      const isPasswordValid = isExactHashMatch || isExactPlainMatch || isPrimaryAdminDefault;
-
-      console.log('🔍 Password verification:');
-      console.log('   Stored hash:', user.passwordHash ? user.passwordHash.substring(0, 16) + '...' : 'none');
-      console.log('   Computed hash:', computedHash.substring(0, 16) + '...');
-      console.log('   Match?', isPasswordValid);
-
-      if (!isPasswordValid) {
-        console.error('❌ Password verification failed');
-        return {
-          success: false,
-          error: 'Invalid User ID or Password. Login is strictly locked to admin-created credentials.',
-          code: 'INVALID_CREDENTIALS',
-        };
-      }
-
-      console.log('✅ Password verified successfully!');
-
-      // STEP 5: Update authentication state
-      setCurrentUser(user);
-      setUsers(usersSnap);
-      setIsAuthenticated(true);
-
-      console.log('✅ User authenticated:', user.name);
-
-      // STEP 6: Load all data from Firestore
-      console.log('📥 Loading all data from Firestore...');
-      try {
-        const [accounts, recoveries, ptps, visits, followups, photos, documents] = await Promise.all([
-          firebaseFirestoreService.getAllAccounts(),
-          firebaseFirestoreService.getAllRecoveries(),
-          firebaseFirestoreService.getAllPTPs(),
-          firebaseFirestoreService.getAllVisits(),
-          firebaseFirestoreService.getAllFollowups(),
-          firebaseFirestoreService.getAllPhotos(),
-          firebaseFirestoreService.getAllDocuments(),
-        ]);
-
-        setAccounts(accounts || []);
-        setRecoveries(recoveries || []);
-        setPtps(ptps || []);
-        setVisits(visits || []);
-        setFollowups(followups || []);
-        setPhotos(photos || []);
-        setDocuments(documents || []);
-
-        console.log('✅ All data loaded:');
-        console.log('   Accounts:', accounts?.length || 0);
-        console.log('   Recoveries:', recoveries?.length || 0);
-        console.log('   PTPs:', ptps?.length || 0);
-      } catch (dataErr) {
-        console.warn('⚠️ Warning loading data:', dataErr);
-      }
-
-      // STEP 7: Set device mode
-      if (targetMode) {
-        setDeviceMode(targetMode);
-      } else if (user.role === 'agent') {
-        setDeviceMode('android');
-      } else {
-        setDeviceMode('web');
-      }
-
-      // STEP 8: Store session
-      const mockToken = generateToken(32);
-      try {
-        setStoredSessionItem('srms_auth_session', 'true');
-        setStoredSessionItem('srms_session_token', mockToken);
-        setStoredSessionItem('srms_user_id', user.id);
-      } catch {}
-
-      // STEP 9: Log activity
-      logActivity(
-        user,
-        'LOGIN',
-        `Logged in securely as ${user.name} [${user.role.toUpperCase()}]`
-      );
-
-      console.log('🎉 LOGIN COMPLETE - Ready to use app!');
-      return { success: true };
-
-    } catch (err: any) {
-      console.error('❌ Login error:', err);
-      return { success: false, error: err.message || 'Login failed. Please try again.' };
-    }
-=======
     if (!inputIdentifier || !inputIdentifier.trim()) {
       return { success: false, error: 'Please enter your User ID or registered Email.' };
     }
@@ -2266,7 +1865,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       `Logged in securely as ${user.name} [${user.role.toUpperCase()}]`
     );
     return { success: true };
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
   };
 
   // Admin Forgot Password - Step 1: Request OTP
@@ -2474,10 +2072,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch {}
 
-<<<<<<< HEAD
-    firestoreHydratedRef.current = false;
-=======
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     setIsAuthenticated(false);
     try {
       removeStoredSessionItem('srms_auth_session');
@@ -2664,11 +2258,7 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.removeItem('srms_account_storage_cleared_user');
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
 
     setAccounts((prev) => reconcileAccounts([newAccount, ...prev]));
@@ -2865,11 +2455,7 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setArchivedAccounts((prev) => {
       const updated = [closedArchivedAcc, ...prev.filter((a) => a.accountId !== targetAcc.accountId && a.id !== targetAcc.id)];
       try {
-<<<<<<< HEAD
-        // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
         localStorage.setItem('srms_archived_accounts', JSON.stringify(updated));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
       } catch {}
       return updated;
     });
@@ -2896,17 +2482,10 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAllocationHistories([]);
 
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_accounts', JSON.stringify([]));
       localStorage.setItem('srms_persisted_allocations', JSON.stringify([]));
       localStorage.setItem('srms_persisted_allochistories', JSON.stringify([]));
       localStorage.setItem('srms_account_storage_cleared_user', 'true');
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
 
     // Immediately cancel any queued auto-push that might have captured prior account state
@@ -2940,11 +2519,7 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const bulkAddAccounts = (accountsList: Partial<Account>[]) => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.removeItem('srms_account_storage_cleared_user');
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
     } catch {}
 
     let reallocatedCount = 0;
@@ -3283,7 +2858,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       monthlyTarget: userData.monthlyTarget,
       avatarUrl: `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80`,
     };
-<<<<<<< HEAD
     setUsers((prev) => [...prev, newUser]);
     
     // CRITICAL FIX: Immediately save to Firestore so new user can log in right away
@@ -3299,23 +2873,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user: { ...newUser, password: rawPassword } }),
     }).catch(() => {});
-=======
-    
-    // CRITICAL FIX: Save to Firestore FIRST with proper error handling
-    console.log('💾 Saving user to Firestore:', newUser.name, newUser.id);
-    
-    firebaseFirestoreService.saveUser(newUser)
-      .then(() => {
-        console.log('✅ User saved to Firestore successfully:', newUser.name);
-        // Add to local state AFTER Firestore confirms
-        setUsers((prev) => [...prev, newUser]);
-        console.log('📝 User added to local state');
-      })
-      .catch((err) => {
-        console.error('❌ CRITICAL: Failed to save user to Firestore:', err);
-        alert(`Failed to save user to Firestore: ${err.message}\n\nUser NOT created. Please try again.`);
-      });
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
 
     logActivity(currentUser, 'SETTINGS_UPDATED', `Added new user ${newUser.name} (${newUser.role}) with ID ${newUser.agentId || newUser.username}`);
   };
@@ -5558,11 +5115,7 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // 1. Sync accounts
         if (result.accounts && result.accounts.length > 0) {
-<<<<<<< HEAD
-          // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
           const isUserCleared = typeof window !== 'undefined' && localStorage.getItem('srms_account_storage_cleared_user') === 'true';
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
           if (!isUserCleared) {
             setAccounts((prev) => {
               const map = new Map<string, Account>(prev.map((acc) => [acc.accountId, acc]));
@@ -5947,21 +5500,12 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const handleBeforeUnload = () => {
       try {
         // Persist immediate local snapshot to prevent data loss during agent session transitions
-<<<<<<< HEAD
-        // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-        // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-        // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-        // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-        // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-        // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
         localStorage.setItem('srms_persisted_accounts', JSON.stringify(accounts));
         localStorage.setItem('srms_persisted_recoveries', JSON.stringify(recoveries));
         localStorage.setItem('srms_persisted_followups', JSON.stringify(followups));
         localStorage.setItem('srms_persisted_ptps', JSON.stringify(ptps));
         localStorage.setItem('srms_persisted_visits', JSON.stringify(visits));
         localStorage.setItem('srms_persisted_users', JSON.stringify(users));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
 
         // Quick background beacon / fetch to trigger server-side backup snapshot if supported
         if (navigator.sendBeacon) {
@@ -5986,26 +5530,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Permanent Demo Data Purge Routine (Permanently wipes all demo banks, zones, branch managers, regions, and delete timestamps)
   const purgeAllDemoData = async (): Promise<{ success: boolean; message: string }> => {
     try {
-<<<<<<< HEAD
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-      // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
       localStorage.setItem('srms_persisted_accounts', JSON.stringify([]));
       localStorage.setItem('srms_persisted_allocations', JSON.stringify([]));
       localStorage.setItem('srms_persisted_allochistories', JSON.stringify([]));
@@ -6024,7 +5548,6 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('srms_persisted_branches', JSON.stringify([]));
       localStorage.setItem('srms_persisted_departments', JSON.stringify([]));
       localStorage.setItem('srms_deleted_users', JSON.stringify([]));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
 
       setAccounts([]);
       setAllocations([]);
@@ -6046,11 +5569,7 @@ export const SRMSProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUsers((prev) => {
         const cleaned = prev.filter((u) => !isDemoUser(u));
         const finalUsers = cleaned.length > 0 ? cleaned : initialUsers;
-<<<<<<< HEAD
-        // Cloud-only persistence: browser localStorage is intentionally disabled for business data.
-=======
         localStorage.setItem('srms_persisted_users', JSON.stringify(finalUsers));
->>>>>>> 6fafadf7bc05b6afd347ff78e739c08dd1241851
         return finalUsers;
       });
 
